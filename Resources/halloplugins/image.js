@@ -1,4 +1,4 @@
-(function() {
+
   (function(jQuery) {
     return jQuery.widget("Liip.halloimage", {
       options: {
@@ -40,9 +40,7 @@
             items.push("<div class=\"pager-next\" style=\"display:none\"></div>");
             container = jQuery("#" + dialogId + " .tab-search .searchResults");
             container.html(items.join(''));
-            if (response.page > 1) {
-              jQuery('.pager-prev', container).show();
-            }
+            if (response.page > 1) jQuery('.pager-prev', container).show();
             if (response.page < Math.ceil(response.total / response.length)) {
               jQuery('.pager-next', container).show();
             }
@@ -127,7 +125,28 @@
       },
       _init: function() {},
       _openDialog: function() {
-        var xposition, yposition;
+        var text, xposition, yposition;
+        var _this = this;
+        text = this.options.editable.element.text();
+        this.options.vie.use(new this.options.vie.StanbolService({
+          url: "http://cmf.lo/stanbol",
+          proxyDisabled: true
+        }));
+        this.options.vie.analyze({
+          element: this.options.editable.element
+        }).using(['stanbol']).execute().success(function(enhancements) {
+          return $(enhancements).each(function(i, e) {
+            var label;
+            label = e.attributes['<<:en>>'];
+            if (label != null) console.log(label);
+            label = e.attributes['<rdfs:label>'];
+            if (typeof label === 'string') return console.log(label);
+          });
+        }).fail(function(xhr) {
+          if (typeof cb === "function") cb(false, xhr);
+          _this._trigger('error', xhr);
+          return _this._logger.error("analyze failed", xhr.responseText, xhr);
+        });
         jQuery('.image_button').addClass('ui-state-clicked');
         jQuery("#" + this.options.uuid + "-sugg-activeImage").attr("src", jQuery("#" + this.options.uuid + "-tab-suggestions-content .imageThumbnailActive").first().attr("src"));
         jQuery("#" + this.options.uuid + "-sugg-activeImageBg").attr("src", jQuery("#" + this.options.uuid + "-tab-suggestions-content .imageThumbnailActive").first().attr("src"));
@@ -146,9 +165,7 @@
           delayAction: function(functionToCall, delay) {
             var timer;
             timer = clearTimeout(timer);
-            if (!timer) {
-              return timer = setTimeout(functionToCall, delay);
-            }
+            if (!timer) return timer = setTimeout(functionToCall, delay);
           },
           calcPosition: function(offset, event) {
             var position;
@@ -158,9 +175,7 @@
             } else if (event.pageX < position) {
               return "left";
             } else {
-              if (event.pageX > (offset.left + third * 2)) {
-                return "right";
-              }
+              if (event.pageX > (offset.left + third * 2)) return "right";
             }
           },
           createInsertElement: function(image, tmp) {
@@ -268,9 +283,7 @@
           handleDragEvent: function(event, ui) {
             var position, tmpFeedbackLR, tmpFeedbackMiddle;
             position = helper.calcPosition(offset, event);
-            if (position === dnd.lastPositionDrag) {
-              return;
-            }
+            if (position === dnd.lastPositionDrag) return;
             dnd.lastPositionDrag = position;
             tmpFeedbackLR = $('.tmp', editable);
             tmpFeedbackMiddle = $('.tmpLine', editable);
@@ -297,9 +310,7 @@
           handleStartEvent: function(event, ui) {
             var internalDrop;
             internalDrop = helper.checkOrigin(event);
-            if (internalDrop) {
-              $(event.target).remove();
-            }
+            if (internalDrop) $(event.target).remove();
             jQuery(document).trigger('startPreventSave');
             return helper.startPlace = jQuery(event.target);
           },
@@ -366,15 +377,11 @@
               return draggables.push(elem);
             };
             $(".rotationWrapper img", widgetOptions.dialog).each(function(index, elem) {
-              if (!elem.jquery_draggable_initialized) {
-                return initDraggable(elem);
-              }
+              if (!elem.jquery_draggable_initialized) return initDraggable(elem);
             });
             $("img", editable).each(function(index, elem) {
               elem.contentEditable = false;
-              if (!elem.jquery_draggable_initialized) {
-                return initDraggable(elem);
-              }
+              if (!elem.jquery_draggable_initialized) return initDraggable(elem);
             });
             return $("p", editable).each(function(index, elem) {
               if (!elem.jquery_droppable_initialized) {
@@ -422,4 +429,3 @@
       }
     });
   })(jQuery);
-}).call(this);

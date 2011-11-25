@@ -185,6 +185,28 @@
         _init: ->
 
         _openDialog: ->
+            
+            text = @options.editable.element.text()
+            @options.vie.use(new @options.vie.StanbolService({
+                url : "http://cmf.lo/stanbol",
+                proxyDisabled: true
+            }));
+            # console.log @options.vie.analyze text
+            @options.vie.analyze( element: @options.editable.element ).using(['stanbol'])
+                .execute()
+                .success (enhancements) =>
+                     $(enhancements).each (i, e) ->
+                         # console.log e
+                         label = e.attributes['<<:en>>']
+                         console.log label if label?
+                         label = e.attributes['<rdfs:label>']
+                         console.log label if typeof label == 'string'
+                .fail (xhr) =>
+                    cb false, xhr if typeof cb is "function"
+                    @_trigger 'error', xhr
+                    @_logger.error "analyze failed", xhr.responseText, xhr
+            
+        
             # Update state of button in toolbar
             jQuery('.image_button').addClass('ui-state-clicked')
 
