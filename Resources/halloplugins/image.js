@@ -62,7 +62,7 @@
             return jQuery.ajax({
               type: "GET",
               url: widget.options.searchUrl,
-              data: "page=" + page + "&length=8",
+              data: "page=" + page + "&length=8&search=" + jQuery("#" + dialogId + " .searchInput").val(),
               success: showResults
             });
           };
