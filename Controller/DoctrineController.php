@@ -60,7 +60,7 @@ abstract class DoctrineController
     public function __construct(SecurityContextInterface $securityContext, ViewHandlerInterface $viewHandler, ValidatorInterface $validator, ManagerRegistry $registry, FilterInterface $filter = null, $name = null, array $map = array())
     {
         $this->securityContext = $securityContext;
-        $this->viewHandle = $viewHandler;
+        $this->viewHandler = $viewHandler;
         $this->filter = $filter;
         $this->validator = $validator;
         $this->registry = $registry;
